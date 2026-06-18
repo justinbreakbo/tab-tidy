@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TabTidy Board</title>
+    <link rel="stylesheet" href="manager.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1>TabTidy</h1>
+          <p id="summary">Loading tabs...</p>
+        </div>
+        <div class="actions">
+          <button id="newRight" type="button" title="Open a new tab to the right">+ Right</button>
+          <button id="refresh" type="button" title="Refresh the board">Refresh</button>
+        </div>
+      </header>
+      <section id="board" class="board" aria-live="polite"></section>
+    </main>
+    <template id="windowTemplate">
+      <article class="window">
+        <header class="window-header">
+          <h2></h2>
+          <span></span>
+        </header>
+        <div class="groups"></div>
+      </article>
+    </template>
+    <template id="groupTemplate">
+      <section class="group">
+        <header class="group-header">
+          <span class="group-dot"></span>
+          <h3></h3>
+          <span class="group-count"></span>
+        </header>
+        <div class="tabs"></div>
+      </section>
+    </template>
+    <template id="tabTemplate">
+      <article class="tab" draggable="true">
+        <img alt="">
+        <button class="title" type="button"></button>
+        <div class="tab-actions">
+          <button class="move-left" type="button" title="Move left">←</button>
+          <button class="move-right" type="button" title="Move right">→</button>
+          <button class="ungroup" type="button" title="Move out of group">Ungroup</button>
+          <button class="close" type="button" title="Close tab">×</button>
+        </div>
+      </article>
+    </template>
+    <script src="manager.js"></script>
+  </body>
+</html>
