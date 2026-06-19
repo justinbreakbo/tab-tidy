@@ -1,4 +1,6 @@
 const NO_GROUP = -1;
+const THUMBNAIL_KEY_PREFIX = "thumbnail:";
+const THUMBNAIL_VERSION = 2;
 const GROUP_COLORS = {
   grey: "#7b8794",
   blue: "#4385f5",
@@ -18,6 +20,8 @@ const groupTemplate = document.getElementById("groupTemplate");
 const tabTemplate = document.getElementById("tabTemplate");
 
 let draggedTabId = null;
+let thumbnailCache = new Map();
+let renderTimer = null;
 
 document.getElementById("newRight").addEventListener("click", async () => {
   await chrome.runtime.sendMessage({ type: "new-tab-to-right" });
@@ -25,6 +29,41 @@ document.getElementById("newRight").addEventListener("click", async () => {
 });
 
 document.getElementById("refresh").addEventListener("click", render);
+
+function scheduleRender() {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(render, 120);
+}
+
+function getThumbnailKey(tabId) {
+  return `${THUMBNAIL_KEY_PREFIX}${tabId}`;
+}
+
+async function loadThumbnails(tabs) {
+  const keys = tabs.map((tab) => getThumbnailKey(tab.id));
+  if (keys.length === 0) return new Map();
+
+  const items = await chrome.storage.local.get(keys);
+  return new Map(
+    tabs
+      .map((tab) => [tab.id, items[getThumbnailKey(tab.id)]])
+      .filter(([, thumbnail]) => thumbnail?.dataUrl && thumbnail.version === THUMBNAIL_VERSION)
+  );
+}
+
+function getTabInitial(tab) {
+  try {
+    const host = new URL(tab.url).hostname.replace(/^www\./, "");
+    return host.charAt(0).toUpperCase() || "T";
+  } catch {
+    return (tab.title || "T").charAt(0).toUpperCase();
+  }
+}
+
+async function activateTab(tab) {
+  await chrome.windows.update(tab.windowId, { focused: true });
+  await chrome.tabs.update(tab.id, { active: true });
+}
 
 function groupTabsByVisualGroup(tabs, tabGroups) {
   const groupById = new Map(tabGroups.map((group) => [group.id, group]));
@@ -71,8 +110,10 @@ function groupTabsByVisualGroup(tabs, tabGroups) {
 async function render() {
   const windows = await chrome.windows.getAll({ populate: true, windowTypes: ["normal"] });
   const tabGroups = await chrome.tabGroups.query({});
+  const allTabs = windows.flatMap((chromeWindow) => chromeWindow.tabs);
   const totalTabs = windows.reduce((count, chromeWindow) => count + chromeWindow.tabs.length, 0);
 
+  thumbnailCache = await loadThumbnails(allTabs);
   summary.textContent = `${totalTabs} tabs across ${windows.length} windows`;
   board.replaceChildren();
 
@@ -115,7 +156,10 @@ function renderGroup(group) {
 
 function renderTab(tab) {
   const tabNode = tabTemplate.content.firstElementChild.cloneNode(true);
-  const favicon = tabNode.querySelector("img");
+  const thumbnail = tabNode.querySelector(".thumbnail");
+  const thumbnailImage = tabNode.querySelector(".thumbnail-image");
+  const thumbnailEmpty = tabNode.querySelector(".thumbnail-empty");
+  const favicon = tabNode.querySelector(".favicon");
   const title = tabNode.querySelector(".title");
   const moveLeft = tabNode.querySelector(".move-left");
   const moveRight = tabNode.querySelector(".move-right");
@@ -124,14 +168,25 @@ function renderTab(tab) {
 
   tabNode.dataset.tabId = String(tab.id);
   favicon.src = tab.favIconUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' rx='4' fill='%237b8794'/%3E%3C/svg%3E";
+  favicon.alt = "";
   title.textContent = tab.title || tab.url || "Untitled tab";
   title.title = tab.url || "";
+  thumbnail.title = tab.url || tab.title || "Open tab";
   ungroup.hidden = tab.groupId === NO_GROUP;
 
-  title.addEventListener("click", async () => {
-    await chrome.windows.update(tab.windowId, { focused: true });
-    await chrome.tabs.update(tab.id, { active: true });
-  });
+  const cachedThumbnail = thumbnailCache.get(tab.id);
+  if (cachedThumbnail?.dataUrl) {
+    thumbnailImage.src = cachedThumbnail.dataUrl;
+    thumbnailImage.hidden = false;
+    thumbnailEmpty.hidden = true;
+  } else {
+    thumbnailImage.hidden = true;
+    thumbnailEmpty.hidden = false;
+    thumbnailEmpty.textContent = getTabInitial(tab);
+  }
+
+  thumbnail.addEventListener("click", () => activateTab(tab));
+  title.addEventListener("click", () => activateTab(tab));
 
   moveLeft.addEventListener("click", async () => {
     await chrome.tabs.move(tab.id, { index: Math.max(0, tab.index - 1) });
@@ -218,5 +273,13 @@ function renderTab(tab) {
   chrome.tabGroups.onUpdated,
   chrome.tabGroups.onMoved
 ].forEach((event) => event?.addListener(render));
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "local") return;
+
+  if (Object.keys(changes).some((key) => key.startsWith(THUMBNAIL_KEY_PREFIX))) {
+    scheduleRender();
+  }
+});
 
 render();

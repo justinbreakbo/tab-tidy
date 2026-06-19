@@ -9,7 +9,7 @@ The product feeling should be tidy, direct, and practical: tabs should land wher
 ## Core User Problems
 
 - `Command+T` opens a new tab at the far right of the tab strip, not beside the current working context.
-- Chrome tab groups become hard to inspect when many tabs are compressed.
+- Chrome tab groups become hard to inspect when many tabs are compressed or visually similar.
 - Managing many tabs requires repeated right-clicks, dragging in the native tab strip, or hunting through tiny tab titles.
 
 ## MVP Scope
@@ -45,16 +45,18 @@ Rationale:
 
 The native tab strip is optimized for quick switching, not cleanup. The board gives users a larger, calmer surface for tab organization.
 
-### 3. Group Hover Expansion
+### 3. Cached Tab Thumbnails
 
 Behavior:
 
-- In the TabTidy board, hovering or focusing a group expands the minimum width of tab cards.
-- Expanded cards reveal more title text and make group contents easier to scan.
+- In the TabTidy board, each tab card includes a 16:9 thumbnail area.
+- When a tab is activated, finishes loading while active, or the board opens from that tab, TabTidy captures the current visible page and stores a compressed local thumbnail.
+- If no thumbnail is available, the card shows a letter placeholder derived from the tab URL hostname or title.
+- Internal Chrome pages and extension pages may remain placeholders because Chrome does not allow normal capture for those surfaces.
 
 Rationale:
 
-Chrome extensions cannot resize the native Chrome tab strip. TabTidy should provide this interaction in its own management surface instead of pretending to control unsupported browser UI.
+Chrome extensions cannot silently screenshot background tabs or modify the native tab strip UI. Cached recent thumbnails give users a visual way to recognize tabs while staying inside supported browser APIs.
 
 ## Interaction Model
 
@@ -81,7 +83,7 @@ TabTidy board tab:
 
 Controls:
 
-- Activate: click tab title.
+- Activate: click tab thumbnail or title.
 - Move left: click left arrow.
 - Move right: click right arrow.
 - Ungroup: click Ungroup on grouped tabs.
@@ -115,6 +117,16 @@ Drag behavior:
 
 - `tabs`: query, create, move, activate, and close tabs.
 - `tabGroups`: read group metadata and add/remove tabs from groups.
+- `storage`: store local thumbnail cache entries for recently visited tabs.
+- `unlimitedStorage`: avoid small local quota issues when many thumbnails are cached.
+- `activeTab` and `<all_urls>`: capture the currently visible ordinary webpage for thumbnails.
+
+Thumbnail cache:
+
+- Stored under `thumbnail:<tabId>` keys in `chrome.storage.local`.
+- Current cache version is tracked in code so old low-quality thumbnails can be ignored after quality changes.
+- The cache is pruned to the most recent entries.
+- Screenshots are local-only and are not transmitted.
 
 ### Shortcut Limits
 
@@ -131,8 +143,10 @@ Users can customize shortcuts at `chrome://extensions/shortcuts`.
 
 - Extensions cannot change the native Chrome tab strip layout.
 - Extensions cannot make native grouped tabs wider on hover.
+- Extensions cannot listen to hover events on the native Chrome tab strip.
+- Extensions cannot silently capture live screenshots of inactive background tabs.
 - Extensions cannot reliably override built-in Chrome shortcuts such as `Command+T`.
-- Some internal Chrome pages may limit favicon or URL visibility.
+- Internal Chrome pages, extension pages, and DevTools pages may not provide thumbnails.
 
 ## Quality Bar
 
@@ -142,7 +156,7 @@ The extension should:
 - Keep tab order stable unless the user explicitly moves a tab.
 - Refresh the board after tab mutations.
 - Stay usable with many tabs and multiple windows.
-- Avoid broad permissions that are not needed.
+- Keep broad screenshot permissions explained and limited to local thumbnail capture.
 
 ## Future Iterations
 
@@ -172,6 +186,7 @@ The extension should:
 - Improve empty states.
 - Add compact and comfortable board density modes.
 - Add clearer selected and drag target states.
+- Add a manual thumbnail refresh affordance for individual tabs.
 
 ### Publishing Prep
 
@@ -187,7 +202,8 @@ The extension should:
 - Verify `Command+Shift+Y` inside a tab group.
 - Verify new tab remains active.
 - Verify `Command+Shift+U` opens the board.
-- Verify group hover expansion in the board.
+- Verify recently visited normal webpages show thumbnails in the board.
+- Verify internal pages fall back to placeholders.
 - Verify activate, move, drag, ungroup, and close actions.
 - Verify multiple windows render correctly.
 - Verify shortcuts are listed at `chrome://extensions/shortcuts`.

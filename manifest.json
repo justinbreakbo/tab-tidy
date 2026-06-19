@@ -4,8 +4,14 @@
   "version": "0.1.0",
   "description": "Keep Chrome tabs tidy with adjacent new tabs and a fast tab management board.",
   "permissions": [
+    "activeTab",
+    "storage",
     "tabs",
-    "tabGroups"
+    "tabGroups",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"

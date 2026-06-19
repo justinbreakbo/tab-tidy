@@ -157,14 +157,8 @@ h1 {
 .tabs {
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   padding: 10px;
-  transition: grid-template-columns 140ms ease;
-}
-
-.group:hover .tabs,
-.group:focus-within .tabs {
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 .tab {
@@ -175,7 +169,7 @@ h1 {
   display: grid;
   gap: 8px;
   grid-template-columns: 18px minmax(0, 1fr);
-  min-height: 84px;
+  min-height: 188px;
   padding: 9px;
 }
 
@@ -187,7 +181,56 @@ h1 {
   border-color: var(--accent);
 }
 
-.tab img {
+.tab:hover,
+.tab:focus-within {
+  border-color: var(--accent);
+}
+
+.thumbnail {
+  align-items: center;
+  aspect-ratio: 16 / 9;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface-soft) 86%, var(--accent)), var(--surface-soft));
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+  width: 100%;
+}
+
+.thumbnail:hover {
+  border-color: var(--accent);
+}
+
+.thumbnail-image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.thumbnail-image[hidden],
+.thumbnail-empty[hidden] {
+  display: none;
+}
+
+.thumbnail-empty {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 28px;
+  font-weight: 700;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+}
+
+.favicon {
   height: 18px;
   width: 18px;
 }
@@ -240,9 +283,7 @@ h1 {
     flex-direction: column;
   }
 
-  .tabs,
-  .group:hover .tabs,
-  .group:focus-within .tabs {
+  .tabs {
     grid-template-columns: 1fr;
   }
 }
