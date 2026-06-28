@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TabTidy",
   "version": "0.1.0",
-  "description": "Keep Chrome tabs tidy with adjacent new tabs and a fast tab management board.",
+  "description": "用相邻新建标签页和 Tab Board 保持 Chrome 标签页整洁。",
   "permissions": [
     "activeTab",
     "storage",
@@ -26,14 +26,21 @@
         "default": "Ctrl+Shift+Y",
         "mac": "Command+Shift+Y"
       },
-      "description": "Open a new tab to the right of the current tab"
+      "description": "在当前标签页右侧新建标签页"
+    },
+    "duplicate-tab-to-right": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+H",
+        "mac": "Command+Shift+H"
+      },
+      "description": "复制当前标签页到右侧"
     },
     "open-tab-board": {
       "suggested_key": {
         "default": "Ctrl+Shift+U",
         "mac": "Command+Shift+U"
       },
-      "description": "Open the TabTidy tab board"
+      "description": "打开 TabTidy 标签页管理面板"
     }
   }
 }

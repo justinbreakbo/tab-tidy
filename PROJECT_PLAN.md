@@ -45,7 +45,22 @@ Rationale:
 
 The native tab strip is optimized for quick switching, not cleanup. The board gives users a larger, calmer surface for tab organization.
 
-### 3. Cached Tab Thumbnails
+### 3. Duplicate Current Tab To The Right
+
+Shortcut: `Command+Shift+H`
+
+Behavior:
+
+- Duplicate the current tab and move the duplicate immediately to its right.
+- If the current tab is inside a Chrome tab group, add the duplicate to the same group.
+- Keep the duplicated tab active after creation.
+- Preserve pinned state when the current tab is pinned.
+
+Rationale:
+
+Users often need a second copy of the current page for branching, comparing, or continuing from the same context. The duplicate should stay beside the source tab instead of breaking the current working cluster.
+
+### 4. Cached Tab Thumbnails
 
 Behavior:
 
@@ -135,6 +150,7 @@ Chrome does not allow extensions to override reserved browser shortcuts such as 
 Default shortcuts:
 
 - `Command+Shift+Y`: new tab to the right.
+- `Command+Shift+H`: duplicate current tab to the right.
 - `Command+Shift+U`: open tab board.
 
 Users can customize shortcuts at `chrome://extensions/shortcuts`.
@@ -200,6 +216,8 @@ The extension should:
 - Load unpacked extension successfully.
 - Verify `Command+Shift+Y` in ungrouped tabs.
 - Verify `Command+Shift+Y` inside a tab group.
+- Verify `Command+Shift+H` duplicates the current tab to the right.
+- Verify `Command+Shift+H` inside a tab group.
 - Verify new tab remains active.
 - Verify `Command+Shift+U` opens the board.
 - Verify recently visited normal webpages show thumbnails in the board.

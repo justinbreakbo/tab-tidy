@@ -143,6 +143,32 @@ async function openNewTabToRight() {
   }
 }
 
+async function duplicateTabToRight() {
+  const current = await getCurrentTab();
+  if (!current?.id) return;
+
+  const duplicated = await chrome.tabs.duplicate(current.id);
+  if (!duplicated?.id) return;
+
+  if (current.pinned !== duplicated.pinned) {
+    await chrome.tabs.update(duplicated.id, { pinned: current.pinned });
+  }
+
+  await chrome.tabs.move(duplicated.id, {
+    index: current.index + 1,
+    windowId: current.windowId
+  });
+
+  if (current.groupId !== NO_GROUP) {
+    await chrome.tabs.group({
+      groupId: current.groupId,
+      tabIds: duplicated.id
+    });
+  }
+
+  await chrome.tabs.update(duplicated.id, { active: true });
+}
+
 async function openTabBoard() {
   const current = await getCurrentTab();
   const url = chrome.runtime.getURL("manager.html");
@@ -169,6 +195,11 @@ chrome.commands.onCommand.addListener((command) => {
     return;
   }
 
+  if (command === "duplicate-tab-to-right") {
+    duplicateTabToRight();
+    return;
+  }
+
   if (command === "open-tab-board") {
     openTabBoard();
   }
@@ -177,6 +208,11 @@ chrome.commands.onCommand.addListener((command) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "new-tab-to-right") {
     openNewTabToRight().then(() => sendResponse({ ok: true }));
+    return true;
+  }
+
+  if (message?.type === "duplicate-tab-to-right") {
+    duplicateTabToRight().then(() => sendResponse({ ok: true }));
     return true;
   }
 
