@@ -1,29 +1,27 @@
 # TabTidy
 
-TabTidy 是一个本地 Chrome 扩展，用于通过相邻新建标签页、相邻复制标签页和可视化 Tab Board 保持标签页整洁。
+TabTidy 是一个本地优先的 Chrome 扩展，用来通过“右侧新建标签页”“右侧复制当前标签页”和可视化 Tab Board 保持标签页整洁。
 
 ## 当前功能
 
 - 在当前标签页右侧立即新建标签页。
-- 一键复制当前标签页，并把复制出的网页放到当前标签页右侧。
-- 如果当前标签页位于 Chrome 标签组中，新建或复制出的标签页会自动加入同一个标签组。
+- 一键复制当前标签页，并把复制出的标签页放到当前标签页右侧。
+- 如果当前标签页位于 Chrome 原生标签组中，新建或复制出的标签页会自动加入同一个标签组。
 - 当前标签页是固定标签页时，新建或复制出的标签页会保留固定状态。
 - 打开全页面 Tab Board，管理所有普通 Chrome 窗口中的标签页。
 - 按 Chrome 原生标签组顺序展示标签页，未分组标签页会按连续区段展示。
-- 在 Tab Board 中显示最近可见页面的 16:9 本地缓存缩略图。
+- 在 Tab Board 中显示最近可见页面的本地缓存缩略图。
 - 对无法截图的页面显示字母占位，例如 Chrome 内部页面、扩展页面或受保护页面。
 - 在 Tab Board 中激活、左移、右移、移出分组、关闭和拖拽标签页。
-- 标签页、标签组或缩略图缓存变化时，Tab Board 会自动刷新。
-- 缩略图只保存在本机 Chrome 扩展存储中，TabTidy 不会上传截图。
+- 缩略图只保存在本机 Chrome 扩展存储中，TabTidy 不会上传截图或浏览数据。
 
 ## 快捷键
 
 - macOS：`Command+Shift+Y`；Windows/Linux：`Ctrl+Shift+Y`。在当前标签页右侧新建标签页。
-- macOS：`Command+Shift+H`；Windows/Linux：`Ctrl+Shift+H`。复制当前标签页到右侧。
+- macOS：`Command+Shift+L`；Windows/Linux：`Ctrl+Shift+L`。复制当前标签页到右侧。
 - macOS：`Command+Shift+U`；Windows/Linux：`Ctrl+Shift+U`。打开 Tab Board。
 
-Chrome 不允许扩展覆盖 `Command+T` 这类浏览器保留快捷键。
-你可以在 `chrome://extensions/shortcuts` 中自定义 TabTidy 的快捷键。
+Chrome 不允许扩展覆盖 `Command+T` 这类浏览器保留快捷键。你可以在 `chrome://extensions/shortcuts` 中自定义 TabTidy 的快捷键。
 
 ## 本地安装
 
@@ -49,5 +47,55 @@ Chrome 扩展不能修改原生标签栏布局、标签 hover 宽度或标签栏
 
 - `tabs`：查询、创建、复制、移动、激活和关闭标签页。
 - `tabGroups`：读取原生标签组信息，把标签页加入分组或移出分组。
-- `storage` / `unlimitedStorage`：在本地保存最近可见标签页的缩略图缓存。
-- `activeTab` / `<all_urls>`：对当前可见的普通网页生成本地缩略图。
+- `storage`：在本地保存最近可见标签页的缩略图缓存。
+- `unlimitedStorage`：避免大量缩略图缓存触发较小的本地存储限制。
+- `activeTab` / `<all_urls>`：在 Chrome 允许时，对当前可见的普通网页生成本地缩略图。
+
+## 隐私说明
+
+TabTidy 在本地运行，不收集、上传、出售或共享个人信息。
+
+TabTidy 会把本地缩略图缓存保存在 `chrome.storage.local` 中。缓存可能包含压缩后的页面缩略图、截图时的标签页标题、截图时的 URL 和用于清理旧缓存的时间戳。这些数据只保存在用户设备上的 Chrome 扩展存储中，不会被 TabTidy 发送到任何服务器。
+
+完整隐私政策草稿见 [PRIVACY.md](PRIVACY.md)。
+
+## 发布打包
+
+运行发布打包脚本：
+
+```powershell
+.\scripts\package.ps1
+```
+
+脚本会校验 `manifest.json`，并生成可上传到 Chrome Web Store 的 ZIP：
+
+```text
+dist\TabTidy-0.1.0.zip
+```
+
+ZIP 根目录会直接包含 `manifest.json`、扩展源码、图标和隐私说明，不会包含 `.git`、`.agents` 或项目计划文档。
+
+## Chrome Web Store 发布准备
+
+发布前需要准备：
+
+- 扩展图标：`icons/icon128.png` 已包含在扩展包中。
+- 小型推广图：`store-assets/promo-small-440x280.png`。
+- 至少一张真实截图，推荐尺寸 `1280x800`。
+- 隐私政策公开 URL，可以基于 `PRIVACY.md` 发布。
+- 商店描述、权限说明和审核测试说明，可以参考 `STORE_LISTING.md`。
+
+## 手动测试清单
+
+- 加载未打包扩展成功。
+- 在未分组标签页中验证右侧新建标签页。
+- 在标签组中验证右侧新建标签页，并确认新标签页进入同一分组。
+- 验证右侧复制当前标签页。
+- 在标签组中验证右侧复制当前标签页，并确认复制页进入同一分组。
+- 验证新建或复制出的标签页保持激活。
+- 验证 `Command+Shift+U` / `Ctrl+Shift+U` 能打开 Tab Board。
+- 验证最近访问的普通网页能显示缩略图。
+- 验证 Chrome 内部页面显示占位符。
+- 验证激活、移动、拖拽、移出分组和关闭标签页功能。
+- 验证多个普通 Chrome 窗口能正确展示。
+- 验证快捷键出现在 `chrome://extensions/shortcuts`。

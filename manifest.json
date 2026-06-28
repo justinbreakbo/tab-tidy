@@ -2,7 +2,13 @@
   "manifest_version": 3,
   "name": "TabTidy",
   "version": "0.1.0",
-  "description": "用相邻新建标签页和 Tab Board 保持 Chrome 标签页整洁。",
+  "description": "\u7528\u53f3\u4fa7\u65b0\u5efa\u3001\u53f3\u4fa7\u590d\u5236\u548c\u53ef\u89c6\u5316\u9762\u677f\u7ba1\u7406 Chrome \u6807\u7b7e\u9875\u3002",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "permissions": [
     "activeTab",
     "storage",
@@ -18,7 +24,13 @@
   },
   "action": {
     "default_title": "TabTidy",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "commands": {
     "new-tab-to-right": {
@@ -26,21 +38,21 @@
         "default": "Ctrl+Shift+Y",
         "mac": "Command+Shift+Y"
       },
-      "description": "在当前标签页右侧新建标签页"
+      "description": "\u5728\u5f53\u524d\u6807\u7b7e\u9875\u53f3\u4fa7\u65b0\u5efa\u6807\u7b7e\u9875"
     },
     "duplicate-tab-to-right": {
       "suggested_key": {
-        "default": "Ctrl+Shift+H",
-        "mac": "Command+Shift+H"
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
       },
-      "description": "复制当前标签页到右侧"
+      "description": "\u590d\u5236\u5f53\u524d\u6807\u7b7e\u9875\u5230\u53f3\u4fa7"
     },
     "open-tab-board": {
       "suggested_key": {
         "default": "Ctrl+Shift+U",
         "mac": "Command+Shift+U"
       },
-      "description": "打开 TabTidy 标签页管理面板"
+      "description": "\u6253\u5f00 TabTidy \u6807\u7b7e\u9875\u7ba1\u7406\u9762\u677f"
     }
   }
 }
