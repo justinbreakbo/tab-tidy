@@ -31,7 +31,7 @@ TabTidy uses Chrome extension permissions only for its tab management features:
 - `tabGroups`: to read tab group information and move tabs in or out of native Chrome tab groups.
 - `storage`: to save local thumbnail cache entries.
 - `unlimitedStorage`: to prevent the local thumbnail cache from failing when many tabs are used.
-- `activeTab` and `<all_urls>`: to capture local thumbnails for currently visible ordinary webpages when Chrome permits it.
+- `activeTab`: to capture local thumbnails for the currently visible ordinary webpage after the user invokes the extension and Chrome permits capture.
 
 ## Third Parties
 
